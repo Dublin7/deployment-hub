@@ -36,7 +36,7 @@ if [[ ! -d .git ]]; then
 fi
 
 git add -A
-git commit -m "chore: initial deployment-hub files" || true
+git diff --quiet --exit-code --cached || git commit -m "chore: initial deployment-hub files"
 
 # Create repository via GitHub CLI and push
 echo "Creating repository ${OWNER}/${REPO}..."

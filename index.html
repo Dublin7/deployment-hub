@@ -1,460 +1,349 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Deployment Hub</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-primary: #0a0e27;
-            --bg-secondary: #151b3d;
-            --bg-card: #1a2140;
-            --text-primary: #e8eaed;
-            --text-secondary: #9aa0b8;
-            --accent: #00d9ff;
-            --accent-hover: #00f0ff;
-            --border: #2a3454;
-            --shadow: rgba(0, 217, 255, 0.1);
-        }
-
-        .light {
-            --bg-primary: #f8f9fa;
-            --bg-secondary: #ffffff;
-            --bg-card: #ffffff;
-            --text-primary: #1a1d2e;
-            --text-secondary: #5a607a;
-            --accent: #0088cc;
-            --accent-hover: #0099dd;
-            --border: #e0e4ea;
-            --shadow: rgba(0, 136, 204, 0.08);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Space Mono', monospace;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            transition: background 0.3s ease, color 0.3s ease;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background:
-                radial-gradient(circle at 20% 30%, rgba(0, 217, 255, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(138, 43, 226, 0.05) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 4rem;
-            padding-top: 2rem;
-        }
-
-        h1 {
-            font-family: 'Syne', sans-serif;
-            font-size: clamp(2.5rem, 8vw, 5rem);
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--accent) 0%, #8a2be2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1rem;
-            letter-spacing: -0.02em;
-        }
-
-        .subtitle {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            font-weight: 400;
-            letter-spacing: 0.05em;
-        }
-
-        .theme-toggle {
-            position: fixed;
-            top: 2rem;
-            right: 2rem;
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px var(--shadow);
-            z-index: 100;
-        }
-
-        .theme-toggle:hover {
-            transform: scale(1.1) rotate(15deg);
-            border-color: var(--accent);
-        }
-
-        .apps-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 2rem;
-            margin-bottom: 4rem;
-        }
-
-        .app-card {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 16px;
-            padding: 2rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 20px var(--shadow);
-        }
-
-        .app-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--accent), #8a2be2);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.3s ease;
-        }
-
-        .app-card:hover {
-            border-color: var(--accent);
-            transform: translateY(-4px);
-            box-shadow: 0 8px 30px var(--shadow);
-        }
-
-        .app-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .app-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--accent), #8a2be2);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 16px var(--shadow);
-        }
-
-        .app-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.75rem;
-            color: var(--text-primary);
-        }
-
-        .app-description {
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-            font-size: 0.95rem;
-        }
-
-        .app-link {
-            display: inline-block;
-            padding: 0.75rem 1.5rem;
-            background: transparent;
-            border: 2px solid var(--accent);
-            color: var(--accent);
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 700;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-            letter-spacing: 0.05em;
-        }
-
-        .app-link:hover {
-            background: var(--accent);
-            color: var(--bg-primary);
-            transform: scale(1.05);
-            box-shadow: 0 4px 16px var(--shadow);
-        }
-
-        .add-app-card {
-            border: 2px dashed var(--border);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 280px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .add-app-card:hover {
-            border-color: var(--accent);
-            background: var(--bg-secondary);
-        }
-
-        .add-icon {
-            font-size: 3rem;
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .add-app-card:hover .add-icon {
-            color: var(--accent);
-            transform: scale(1.2);
-        }
-
-        .add-text {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-        }
-
-        footer {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            border-top: 1px solid var(--border);
-            margin-top: 4rem;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            background: rgba(0, 217, 255, 0.1);
-            border: 1px solid var(--accent);
-            border-radius: 12px;
-            font-size: 0.75rem;
-            color: var(--accent);
-            margin-bottom: 1rem;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-        }
-
-        @media (max-width: 768px) {
-            .apps-grid {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-
-            .theme-toggle {
-                top: 1rem;
-                right: 1rem;
-            }
-
-            header {
-                margin-bottom: 3rem;
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .app-card {
-            animation: fadeInUp 0.6s ease forwards;
-            opacity: 0;
-        }
-
-        .app-card:nth-child(1) { animation-delay: 0.1s; }
-        .app-card:nth-child(2) { animation-delay: 0.2s; }
-        .app-card:nth-child(3) { animation-delay: 0.3s; }
-        .app-card:nth-child(4) { animation-delay: 0.4s; }
-        .app-card:nth-child(5) { animation-delay: 0.5s; }
-        .app-card:nth-child(6) { animation-delay: 0.6s; }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>App Deployment Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg-primary:#0a0e27;--bg-secondary:#151b3d;--bg-card:#1a2140;--text-primary:#e8eaed;--text-secondary:#9aa0b8;--accent:#00d9ff;--border:#2a3454;--shadow:rgba(0,217,255,0.1);}
+    .light{--bg-primary:#f8f9fa;--bg-secondary:#fff;--bg-card:#fff;--text-primary:#1a1d2e;--text-secondary:#5a607a;--accent:#0088cc;--border:#e0e4ea;--shadow:rgba(0,136,204,0.08);}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Space Mono',monospace;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background .3s,color .3s}
+    .container{max-width:1400px;margin:0 auto;padding:2rem;position:relative;z-index:1}
+    header{text-align:center;margin-bottom:3.5rem;padding-top:2rem}
+    h1{font-family:'Syne',sans-serif;font-size:clamp(2.5rem,8vw,4rem);font-weight:800;background:linear-gradient(135deg,var(--accent),#8a2be2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:1rem}
+    .theme-toggle{position:fixed;top:2rem;right:2rem;background:var(--bg-card);border:2px solid var(--border);width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:100}
+    .apps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:2rem;margin-bottom:2.5rem}
+    .app-card{background:var(--bg-card);border:2px solid var(--border);border-radius:16px;padding:2rem;position:relative;overflow:hidden;box-shadow:0 4px 20px var(--shadow)}
+    .app-icon{width:60px;height:60px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:2rem;margin-bottom:1rem;overflow:hidden;background:linear-gradient(135deg,var(--accent),#8a2be2)}
+    .app-icon img{width:100%;height:100%;object-fit:cover;display:block}
+    .app-title{font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:700;margin-bottom:.5rem}
+    .app-description{color:var(--text-secondary);line-height:1.6;margin-bottom:1rem}
+    .app-link{display:inline-block;padding:.6rem 1.2rem;border:2px solid var(--accent);color:var(--accent);text-decoration:none;border-radius:8px;font-weight:700}
+    .add-app-card{border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:220px;cursor:pointer}
+    footer{display:flex;gap:.5rem;align-items:center;justify-content:center;flex-wrap:wrap;color:var(--text-secondary);padding:1.5rem;border-top:1px solid var(--border)}
+    .modal-backdrop{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);z-index:1000;padding:1rem}
+    .modal{width:100%;max-width:760px;border-radius:12px;padding:1.25rem;background:var(--bg-card);border:2px solid var(--border);box-shadow:0 20px 60px var(--shadow)}
+    .form-row{display:flex;gap:.75rem;margin-bottom:.75rem}
+    .form-row.col{flex-direction:column}
+    label{color:var(--text-secondary);font-size:.85rem;margin-bottom:.25rem}
+    input[type="text"],input[type="url"],select,textarea{width:100%;padding:.6rem .75rem;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-primary)}
+    textarea{min-height:90px;resize:vertical}
+    .icon-preview{width:60px;height:60px;border-radius:12px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:.5rem;background:linear-gradient(135deg,var(--accent),#8a2be2);display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:var(--bg-primary)}
+    .dropzone{border:2px dashed var(--border);padding:.5rem;border-radius:8px;text-align:center;color:var(--text-secondary);cursor:pointer}
+    .btn-primary{background:var(--accent);color:var(--bg-primary);padding:.6rem .9rem;border-radius:8px;border:none;cursor:pointer}
+    .btn-secondary{background:transparent;color:var(--text-secondary);border:1px solid var(--border);padding:.5rem .8rem;border-radius:8px;cursor:pointer}
+    .helper{font-size:.85rem;color:var(--text-secondary)}
+    @media(max-width:768px){.apps-grid{grid-template-columns:1fr;gap:1.25rem}.theme-toggle{top:1rem;right:1rem}}
+  </style>
 </head>
 <body>
-    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
-        <span id="theme-icon">🌙</span>
-    </button>
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme"><span id="theme-icon">🌙</span></button>
+  <div class="container">
+    <header>
+      <h1>DEPLOYMENT HUB</h1>
+      <p class="helper">Your central portal for web applications</p>
+    </header>
 
-    <div class="container">
-        <header>
-            <h1>DEPLOYMENT HUB</h1>
-            <p class="subtitle">Your central portal for web applications</p>
-        </header>
+    <!-- APPS_GRID_START -->
+    <div class="apps-grid" id="appsGrid" aria-live="polite">
+      <div class="app-card add-app-card" id="openAdd"><div style="font-size:2rem">+</div><p style="margin-top:.5rem">Add New App</p></div>
+    </div>
+    <!-- APPS_GRID_END -->
 
-        <div class="apps-grid" id="appsGrid">
-            <!-- Example App 1 -->
-            <div class="app-card">
-                <div class="status-badge">LIVE</div>
-                <div class="app-icon">🚀</div>
-                <h2 class="app-title">Task Manager Pro</h2>
-                <p class="app-description">A powerful task management application with real-time collaboration, priority tracking, and deadline notifications.</p>
-                <a href="#" class="app-link">LAUNCH APP →</a>
-            </div>
+    <footer>
+      <div>Deployment Hub © 2025 • Built for GitHub Pages</div>
+      <div style="display:flex;gap:.5rem;align-items:center;">
+        <button class="btn-secondary" id="exportBtn">Export JSON</button>
+        <label class="btn-secondary" style="cursor:pointer">Import JSON<input id="importInput" type="file" accept="application/json" style="display:none" /></label>
+        <button class="btn-secondary" id="clearLocal">Reset Local</button>
+      </div>
+    </footer>
+  </div>
 
-            <!-- Example App 2 -->
-            <div class="app-card">
-                <div class="status-badge">LIVE</div>
-                <div class="app-icon">📊</div>
-                <h2 class="app-title">Analytics Dashboard</h2>
-                <p class="app-description">Comprehensive data visualization dashboard with interactive charts, real-time metrics, and export capabilities.</p>
-                <a href="#" class="app-link">LAUNCH APP →</a>
-            </div>
+  <!-- Modal -->
+  <div id="appModal" class="modal-backdrop" style="display:none;" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+      <h2 style="color:var(--accent);font-family:'Syne',sans-serif;margin-bottom:.5rem">Add / Edit App</h2>
 
-            <!-- Example App 3 -->
-            <div class="app-card">
-                <div class="status-badge">LIVE</div>
-                <div class="app-icon">🎨</div>
-                <h2 class="app-title">Design Studio</h2>
-                <p class="app-description">Creative workspace for designers with AI-powered tools, asset management, and collaborative features.</p>
-                <a href="#" class="app-link">LAUNCH APP →</a>
-            </div>
+      <div class="form-row col">
+        <div><label>Title</label><input id="appTitle" type="text" /></div>
+        <div><label>Status</label><select id="appStatus"><option>LIVE</option><option>BETA</option><option>DRAFT</option></select></div>
+      </div>
 
-            <!-- Example App 4 -->
-            <div class="app-card">
-                <div class="status-badge">LIVE</div>
-                <div class="app-icon">💬</div>
-                <h2 class="app-title">Chat Platform</h2>
-                <p class="app-description">Real-time messaging platform with channels, direct messages, file sharing, and bot integrations.</p>
-                <a href="#" class="app-link">LAUNCH APP →</a>
-            </div>
+      <div class="form-row col"><label>Description</label><textarea id="appDescription"></textarea></div>
 
-            <!-- Example App 5 -->
-            <div class="app-card">
-                <div class="status-badge">LIVE</div>
-                <div class="app-icon">🎮</div>
-                <h2 class="app-title">Game Portal</h2>
-                <p class="app-description">Collection of browser-based games with leaderboards, achievements, and multiplayer support.</p>
-                <a href="#" class="app-link">LAUNCH APP →</a>
-            </div>
-
-            <!-- Add New App Card -->
-            <div class="app-card add-app-card" onclick="showAddAppInfo()">
-                <div class="add-icon">+</div>
-                <p class="add-text">Add New App</p>
-            </div>
+      <div class="form-row">
+        <div style="flex:1">
+          <label>Launch URL</label><input id="appUrl" type="url" placeholder="https://example.com" />
+          <div class="helper">Paste the app URL (or a GitHub Pages URL).</div>
         </div>
 
-        <footer>
-            <p>Deployment Hub © 2025 • Built for GitHub Pages</p>
-            <p style="margin-top: 0.5rem; opacity: 0.7;">To add a new app, edit the appsGrid section in index.html</p>
-        </footer>
+        <div style="width:280px">
+          <label>Icon (emoji, upload, drag & drop)</label>
+          <div style="display:flex;gap:.5rem;align-items:center">
+            <div class="icon-preview" id="iconPreview">🚀</div>
+            <div style="flex:1">
+              <input id="emojiInput" type="text" maxlength="2" placeholder="🚀" style="width:60px;padding:.4rem;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text-primary)"/>
+              <div class="dropzone" id="dropzone">Drop image here or click to choose<input id="iconFile" type="file" accept="image/*" style="display:none" /></div>
+              <div style="margin-top:.5rem">
+                <label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox" id="uploadCloudCheckbox" /> Upload to Cloudinary</label>
+                <label style="display:flex;gap:.5rem;align-items:center;margin-top:.35rem"><input type="checkbox" id="useSignedUpload" /> Use signed uploads (server)</label>
+                <div class="helper">For signed uploads deploy the sign server and provide its URL below.</div>
+                <input id="signServerUrl" type="text" placeholder="https://my-sign-server.example" style="margin-top:.4rem" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <details style="margin-top:.5rem;color:var(--text-secondary)"><summary>Cloudinary client settings (unsigned)</summary>
+        <div style="margin-top:.5rem">
+          <label>Cloud name</label><input id="cloudName" type="text" placeholder="your-cloud-name" />
+          <label style="margin-top:.5rem">Unsigned upload preset</label><input id="uploadPreset" type="text" placeholder="unsigned-preset" />
+          <div class="helper">If using unsigned uploads, set the unsigned preset name here.</div>
+        </div>
+      </details>
+
+      <div style="display:flex;gap:.5rem;align-items:center;margin-top:.75rem">
+        <button class="btn-primary" id="saveAppBtn">Save</button>
+        <button class="btn-secondary" id="cancelModal">Cancel</button>
+        <div style="flex:1"></div>
+        <div class="helper">Icons uploaded to Cloudinary will be public. Signed uploads require a deployed signing server.</div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        // Theme Toggle
-        function toggleTheme() {
-            document.documentElement.classList.toggle('light');
-            const icon = document.getElementById('theme-icon');
-            icon.textContent = document.documentElement.classList.contains('light') ? '☀️' : '🌙';
-        }
+  <template id="cardTemplate">
+    <div class="app-card">
+      <div class="card-actions" style="position:absolute;top:12px;right:12px;display:flex;gap:.5rem">
+        <button class="copy-btn">Copy HTML</button><button class="edit-btn">Edit</button><button class="delete-btn">Delete</button>
+      </div>
+      <div class="status-badge">LIVE</div>
+      <div class="app-icon">🚀</div>
+      <h2 class="app-title">Title</h2>
+      <p class="app-description">Description</p>
+      <a class="app-link" href="#" target="_blank" rel="noopener">LAUNCH APP →</a>
+    </div>
+  </template>
 
-        // Detect system theme preference
-        window.addEventListener('DOMContentLoaded', () => {
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-                document.documentElement.classList.add('light');
-                document.getElementById('theme-icon').textContent = '☀️';
-            }
+  <script>
+  // Simple helpers
+  const qs = (s, el=document)=>el.querySelector(s), qsa=(s,el=document)=>Array.from(el.querySelectorAll(s));
 
-            // Listen for system theme changes
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-                if (event.matches) {
-                    document.documentElement.classList.remove('light');
-                    document.getElementById('theme-icon').textContent = '🌙';
-                } else {
-                    document.documentElement.classList.add('light');
-                    document.getElementById('theme-icon').textContent = '☀️';
-                }
-            });
-        });
+  // Storage keys
+  const LS_KEY = 'deploymentHub.apps.v3';
+  const LS_CLOUD = 'deploymentHub.cloud.v2';
 
-        // Add App Info
-        function showAddAppInfo() {
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.8);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 1000;
-                padding: 2rem;
-            `;
+  // DOM
+  const appsGrid = qs('#appsGrid');
+  const openAdd = qs('#openAdd');
+  const modal = qs('#appModal');
+  const saveBtn = qs('#saveAppBtn');
+  const cancelBtn = qs('#cancelModal');
+  const titleEl = qs('#appTitle');
+  const descEl = qs('#appDescription');
+  const urlEl = qs('#appUrl');
+  const statusEl = qs('#appStatus');
+  const iconFile = qs('#iconFile');
+  const iconPreview = qs('#iconPreview');
+  const emojiInput = qs('#emojiInput');
+  const dropzone = qs('#dropzone');
+  const exportBtn = qs('#exportBtn');
+  const importInput = qs('#importInput');
+  const clearLocal = qs('#clearLocal');
+  const cloudName = qs('#cloudName');
+  const uploadPreset = qs('#uploadPreset');
+  const uploadCloudCheckbox = qs('#uploadCloudCheckbox');
+  const useSignedUpload = qs('#useSignedUpload');
+  const signServerUrl = qs('#signServerUrl');
 
-            modal.innerHTML = `
-                <div style="
-                    background: var(--bg-card);
-                    border: 2px solid var(--accent);
-                    border-radius: 16px;
-                    padding: 2rem;
-                    max-width: 600px;
-                    width: 100%;
-                    box-shadow: 0 20px 60px rgba(0, 217, 255, 0.3);
-                ">
-                    <h2 style="font-family: 'Syne', sans-serif; color: var(--accent); margin-bottom: 1rem;">Add New App</h2>
-                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
-                        To add a new app to your deployment hub:
-                    </p>
-                    <ol style="color: var(--text-secondary); line-height: 1.8; margin-left: 1.5rem; margin-bottom: 1.5rem;">
-                        <li>Open <code style="background: var(--bg-primary); padding: 0.2rem 0.5rem; border-radius: 4px; color: var(--accent);">index.html</code> in your editor</li>
-                        <li>Find the <code style="background: var(--bg-primary); padding: 0.2rem 0.5rem; border-radius: 4px; color: var(--accent);">appsGrid</code> section</li>
-                        <li>Copy an existing app card template</li>
-                        <li>Update the icon, title, description, and link</li>
-                        <li>Commit and push to GitHub</li>
-                    </ol>
-                    <button onclick="this.closest('[style*=fixed]').remove()" style="
-                        padding: 0.75rem 2rem;
-                        background: var(--accent);
-                        border: none;
-                        border-radius: 8px;
-                        color: var(--bg-primary);
-                        font-weight: 700;
-                        cursor: pointer;
-                        font-family: 'Space Mono', monospace;
-                        font-size: 0.9rem;
-                        letter-spacing: 0.05em;
-                    ">GOT IT</button>
-                </div>
-            `;
+  let apps = [];
+  let editingId = null;
+  let currentIcon = ''; // dataURL or remote URL
 
-            document.body.appendChild(modal);
-            modal.onclick = (e) => {
-                if (e.target === modal) modal.remove();
-            };
-        }
-    </script>
+  function id(){return Math.random().toString(36).slice(2,9);}
+
+  // load/save cloud config
+  function loadCloudConfig(){try{return JSON.parse(localStorage.getItem(LS_CLOUD))||{};}catch(e){console.error('Failed to load cloud config:', e); return {};}}
+  function saveCloudConfig(){localStorage.setItem(LS_CLOUD, JSON.stringify({cloudName:cloudName.value,uploadPreset:uploadPreset.value}));}
+
+  // load apps
+  function loadApps(){try{const raw=localStorage.getItem(LS_KEY); if(raw) apps=JSON.parse(raw); else {apps=[sampleApps()]; saveApps();}}catch(e){apps=[].concat(sampleApps());} renderApps();}
+  function saveApps(){localStorage.setItem(LS_KEY, JSON.stringify(apps));}
+
+  function sampleApps(){ return [
+    {id:id(),status:'LIVE',iconEmoji:'🚀',iconData:'',title:'Task Manager Pro',description:'A powerful task management application',url:'#'},
+    {id:id(),status:'LIVE',iconEmoji:'📊',iconData:'',title:'Analytics Dashboard',description:'Comprehensive data visualization',url:'#'}
+  ];}
+
+  function renderApps(){
+    appsGrid.innerHTML='';
+    apps.forEach((a,i)=>{
+      const tpl = qs('#cardTemplate').content.cloneNode(true);
+      const card = tpl.querySelector('.app-card'); card.style.animationDelay = (i*0.08)+'s';
+      card.querySelector('.status-badge').textContent = a.status||'LIVE';
+      const icon = card.querySelector('.app-icon');
+      if(a.iconData){ icon.textContent=''; const img=document.createElement('img'); img.src=a.iconData; img.alt=a.title+' icon'; icon.appendChild(img);} else icon.textContent = a.iconEmoji || '🔷';
+      card.querySelector('.app-title').textContent = a.title;
+      card.querySelector('.app-description').textContent = a.description;
+      const link = card.querySelector('.app-link'); link.href = a.url || '#';
+      card.querySelector('.copy-btn').addEventListener('click', ()=>copyCardSnippet(a));
+      card.querySelector('.edit-btn').addEventListener('click', ()=>openEdit(a.id));
+      card.querySelector('.delete-btn').addEventListener('click', ()=>{ if(confirm('Delete "'+a.title+'"?')){ apps=apps.filter(x=>x.id!==a.id); saveApps(); renderApps(); }});
+      appsGrid.appendChild(card);
+    });
+    const add = document.createElement('div'); add.className='app-card add-app-card'; add.id='openAdd'; add.innerHTML='<div style="font-size:2rem">+</div><p style="margin-top:.5rem">Add New App</p>'; add.addEventListener('click', openAdd); appsGrid.appendChild(add);
+  }
+
+  function openAdd(){editingId=null;titleEl.value='';descEl.value='';urlEl.value='';statusEl.value='LIVE';emojiInput.value='';iconFile.value='';currentIcon='';iconPreview.innerHTML='🚀';uploadCloudCheckbox.checked=false;useSignedUpload.checked=false;const cfg=loadCloudConfig();cloudName.value=cfg.cloudName||'';uploadPreset.value=cfg.uploadPreset||'';saveBtn.textContent='Add App';showModal();}
+  function openEdit(idVal){const a=apps.find(x=>x.id===idVal); if(!a) return; editingId=a.id; titleEl.value=a.title; descEl.value=a.description; urlEl.value=a.url; statusEl.value=a.status||'LIVE'; emojiInput.value=a.iconEmoji||''; currentIcon=a.iconData||''; if(currentIcon){ iconPreview.innerHTML=''; const img=document.createElement('img'); img.src=currentIcon; img.alt='icon'; img.style.width='100%'; img.style.height='100%'; img.style.objectFit='cover'; iconPreview.appendChild(img);} else iconPreview.innerHTML = a.iconEmoji||'🚀'; saveBtn.textContent='Save'; showModal(); }
+  function showModal(){ modal.style.display='flex'; modal.setAttribute('aria-hidden','false'); setTimeout(()=>titleEl.focus(),120); }
+  function closeModal(){ modal.style.display='none'; modal.setAttribute('aria-hidden','true'); }
+
+  // dropzone/resize/upload functions
+  dropzone.addEventListener('click', ()=>iconFile.click());
+  dropzone.addEventListener('dragover', e=>{e.preventDefault(); dropzone.style.borderColor='var(--accent)';});
+  dropzone.addEventListener('dragleave', ()=>dropzone.style.borderColor='');
+  dropzone.addEventListener('drop', async e=>{ e.preventDefault(); dropzone.style.borderColor=''; const f=e.dataTransfer.files && e.dataTransfer.files[0]; if(f) await handleImageFile(f); });
+
+  iconFile.addEventListener('change', async e=>{ const f = e.target.files && e.target.files[0]; if(f) await handleImageFile(f); });
+
+  emojiInput.addEventListener('input', e=>{ currentIcon=''; iconPreview.innerHTML = e.target.value || '🚀'; iconFile.value=''; });
+
+  async function handleImageFile(file){
+    // client-side resize to max 1024 px
+    const maxDim = 1024;
+    const resized = await resizeImageFile(file, maxDim, 0.85);
+    // preview
+    const dataUrl = await blobToDataURL(resized);
+    iconPreview.innerHTML=''; const img=document.createElement('img'); img.src=dataUrl; img.alt='preview'; img.style.width='100%'; img.style.height='100%'; img.style.objectFit='cover'; iconPreview.appendChild(img);
+    emojiInput.value=''; currentIcon = dataUrl;
+
+    // if user wants to upload to Cloudinary
+    saveCloudConfig();
+    if(uploadCloudCheckbox.checked){
+      if(useSignedUpload.checked){
+        // request signature from server
+        const server = signServerUrl.value.trim();
+        if(!server){ alert('Please provide a sign server URL for signed uploads'); return; }
+        try {
+          const timestamp = Math.floor(Date.now()/1000);
+          const params = { timestamp };
+          const resp = await fetch(server.replace(/\/$/, '') + '/sign', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(params) });
+          if(!resp.ok) throw new Error('Sign server responded '+resp.status);
+          const json = await resp.json(); // { signature, timestamp, api_key, cloud_name }
+          const uploadedUrl = await uploadBlobToCloudinary(resized, { cloudName: json.cloud_name, api_key: json.api_key, signature: json.signature, timestamp: json.timestamp });
+          currentIcon = uploadedUrl; iconPreview.innerHTML=''; const im=document.createElement('img'); im.src=uploadedUrl; im.style.width='100%'; im.style.height='100%'; im.style.objectFit='cover'; iconPreview.appendChild(im);
+          alert('Uploaded (signed) to Cloudinary.');
+        } catch (err){ console.error(err); alert('Signed upload failed: '+err.message); }
+      } else {
+        // unsigned client-side upload using cloud name + preset
+        const cname = cloudName.value.trim(); const preset = uploadPreset.value.trim();
+        if(!cname || !preset){ alert('Provide cloud name and unsigned preset for client uploads'); return; }
+        try {
+          const uploadedUrl = await uploadBlobToCloudinary(resized, { cloudName: cname, uploadPreset: preset });
+          currentIcon = uploadedUrl; iconPreview.innerHTML=''; const im=document.createElement('img'); im.src=uploadedUrl; im.style.width='100%'; im.style.height='100%'; im.style.objectFit='cover'; iconPreview.appendChild(im);
+          alert('Uploaded (unsigned) to Cloudinary.');
+        } catch(err){ console.error(err); alert('Upload failed: '+err.message); }
+      }
+    }
+  }
+
+  function resizeImageFile(file, maxDim, quality=0.9){
+    return new Promise((res, rej)=>{
+      const img = new Image();
+      img.onload = async ()=>{
+        let [w,h] = [img.width, img.height];
+        const ratio = Math.min(1, maxDim / Math.max(w,h));
+        const nw = Math.round(w * ratio), nh = Math.round(h * ratio);
+        const canvas = document.createElement('canvas'); canvas.width = nw; canvas.height = nh;
+        const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, nw, nh);
+        canvas.toBlob(blob => {
+          if(blob) res(blob); else rej(new Error('Failed to create blob'));
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = () => rej(new Error('Invalid image'));
+      // create object URL to load reliably
+      const url = URL.createObjectURL(file); img.src = url;
+      img.onloadend = () => { URL.revokeObjectURL(url); };
+    });
+  }
+
+  function blobToDataURL(blob){ return new Promise((res)=>{ const r=new FileReader(); r.onload = e=>res(e.target.result); r.readAsDataURL(blob); }); }
+
+  async function uploadBlobToCloudinary(blob, opts){
+    // opts: { cloudName, uploadPreset } for unsigned
+    // or { cloudName, api_key, signature, timestamp } for signed
+    const form = new FormData();
+    form.append('file', blob, 'icon.jpg');
+    const cloud = opts.cloudName;
+    if(!cloud) throw new Error('Missing cloud name');
+    if(opts.uploadPreset){
+      form.append('upload_preset', opts.uploadPreset);
+    } else {
+      // signed
+      form.append('api_key', opts.api_key);
+      form.append('timestamp', opts.timestamp);
+      form.append('signature', opts.signature);
+    }
+    const resp = await fetch('https://api.cloudinary.com/v1_1/'+encodeURIComponent(cloud)+'/image/upload', { method:'POST', body: form });
+    if(!resp.ok) throw new Error('Upload failed: '+resp.status);
+    const j = await resp.json();
+    if(!j.secure_url && !j.url) throw new Error('No URL returned');
+    return j.secure_url || j.url;
+  }
+
+  // saving
+  saveBtn.addEventListener('click', ()=>{
+    const t = titleEl.value.trim() || 'Untitled';
+    const d = descEl.value.trim() || '';
+    const u = urlEl.value.trim() || '#';
+    const s = statusEl.value;
+    const emoji = emojiInput.value.trim();
+    saveCloudConfig();
+    const newApp = { id: editingId||id(), status: s, iconEmoji: currentIcon && currentIcon.startsWith('data:') ? '' : (emoji||'🔷'), iconData: currentIcon, title: t, description: d, url: u };
+    if(editingId) apps = apps.map(a=>a.id===editingId?newApp:a); else apps.unshift(newApp);
+    saveApps(); renderApps(); closeModal();
+  });
+
+  cancelBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e)=>{ if(e.target===modal) closeModal(); });
+
+  // export/import
+  exportBtn.addEventListener('click', ()=>{ const blob=new Blob([JSON.stringify(apps, null, 2)], {type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='apps.json'; a.click(); URL.revokeObjectURL(a.href); });
+  importInput.addEventListener('change', async e=>{ const f=e.target.files && e.target.files[0]; if(!f) return; try{ const txt = await f.text(); const imported = JSON.parse(txt); if(!Array.isArray(imported)) throw new Error('Invalid file'); if(confirm('Replace current apps? Cancel to append.')) apps = imported; else apps = [...imported.map(x=>({...x,id:x.id||id()})), ...apps]; saveApps(); renderApps(); } catch(err){ alert('Import failed: '+err.message) } finally { importInput.value=''; } });
+
+  clearLocal.addEventListener('click', ()=>{ if(confirm('Reset local apps and restore defaults?')){ localStorage.removeItem(LS_KEY); loadApps(); } });
+
+  // snippet copy
+  async function copyCardSnippet(a){
+    const iconHtml = a.iconData ? `<div class="app-icon"><img src="${escapeHtml(a.iconData)}" alt="${escapeHtml(a.title)} icon"/></div>` : `<div class="app-icon">${escapeHtml(a.iconEmoji||'🔷')}</div>`;
+    const html = `<div class="app-card">\n  <div class="status-badge">${escapeHtml(a.status||'LIVE')}</div>\n  ${iconHtml}\n  <h2 class="app-title">${escapeHtml(a.title)}</h2>\n  <p class="app-description">${escapeHtml(a.description)}</p>\n  <a class="app-link" href="${escapeAttr(a.url||'#')}" target="_blank" rel="noopener">LAUNCH APP →</a>\n</div>`;
+    try{ await navigator.clipboard.writeText(html); alert('HTML snippet copied. Paste between APPS_GRID_START and APPS_GRID_END in index.html and commit.'); } catch{ alert('Copy failed — use export JSON or copy from console.'); console.log(html); }
+  }
+
+  function escapeHtml(s){ return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function escapeAttr(s){ return String(s||'').replace(/"/g,'&quot;'); }
+
+  // theme
+  const themeToggle = qs('#themeToggle'), themeIcon = qs('#theme-icon');
+  function toggleTheme(){ document.documentElement.classList.toggle('light'); themeIcon.textContent = document.documentElement.classList.contains('light')?'☀️':'🌙'; try{ localStorage.setItem('deploymentHub.theme', document.documentElement.classList.contains('light')?'light':'dark'); }catch{} }
+  themeToggle.addEventListener('click', toggleTheme);
+  (function loadTheme(){ try{ const saved=localStorage.getItem('deploymentHub.theme'); if(saved==='light'){document.documentElement.classList.add('light'); themeIcon.textContent='☀️'} else if(saved==='dark'){document.documentElement.classList.remove('light'); themeIcon.textContent='🌙'} else if(window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches){document.documentElement.classList.add('light'); themeIcon.textContent='☀️'} }catch{} })();
+
+  // utilities
+  function blobToDataURLSync(blob, cb){ const r=new FileReader(); r.onload=e=>cb(e.target.result); r.readAsDataURL(blob); }
+
+  // open add event
+  appsGrid.addEventListener('click', e=>{ if(e.target.closest('#openAdd')) openAdd(); });
+
+  // init
+  (function init(){ const cfg = loadCloudConfig(); cloudName.value = cfg.cloudName || ''; uploadPreset.value = cfg.uploadPreset || ''; loadApps(); })();
+
+  </script>
 </body>
 </html>
-

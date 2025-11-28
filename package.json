@@ -1,5 +1,6 @@
 {
   "name": "deployment-hub",
+  "private": true,
   "version": "1.0.0",
   "description": "Deployment Hub - UI + automation",
   "main": "index.js",

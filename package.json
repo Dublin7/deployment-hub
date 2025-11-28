@@ -1,0 +1,17 @@
+{
+  "name": "deployment-hub",
+  "version": "1.0.0",
+  "description": "Deployment Hub - UI + automation",
+  "main": "index.js",
+  "scripts": {
+    "start-server": "node server/index.js",
+    "apply": "node scripts/apply-apps.js"
+  },
+  "dependencies": {
+    "@octokit/rest": "^19.0.7",
+    "jsdom": "^22.1.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

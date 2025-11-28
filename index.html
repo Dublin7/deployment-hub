@@ -168,7 +168,7 @@
   function id(){return Math.random().toString(36).slice(2,9);}
 
   // load/save cloud config
-  function loadCloudConfig(){try{return JSON.parse(localStorage.getItem(LS_CLOUD))||{};}catch{return {};}}
+  function loadCloudConfig(){try{return JSON.parse(localStorage.getItem(LS_CLOUD))||{};}catch(e){console.error('Failed to load cloud config:', e); return {};}}
   function saveCloudConfig(){localStorage.setItem(LS_CLOUD, JSON.stringify({cloudName:cloudName.value,uploadPreset:uploadPreset.value}));}
 
   // load apps

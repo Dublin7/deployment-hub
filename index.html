@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Deployment Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #151b3d;
+            --bg-card: #1a2140;
+            --text-primary: #e8eaed;
+            --text-secondary: #9aa0b8;
+            --accent: #00d9ff;
+            --accent-hover: #00f0ff;
+            --border: #2a3454;
+            --shadow: rgba(0, 217, 255, 0.1);
+        }
+
+        .light {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #1a1d2e;
+            --text-secondary: #5a607a;
+            --accent: #0088cc;
+            --accent-hover: #0099dd;
+            --border: #e0e4ea;
+            --shadow: rgba(0, 136, 204, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(0, 217, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(138, 43, 226, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding-top: 2rem;
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent) 0%, #8a2be2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            letter-spacing: 0.05em;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px var(--shadow);
+            z-index: 100;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1) rotate(15deg);
+            border-color: var(--accent);
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .app-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+
+        .app-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), #8a2be2);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .app-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px var(--shadow);
+        }
+
+        .app-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .app-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent), #8a2be2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 16px var(--shadow);
+        }
+
+        .app-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .app-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .app-link {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .app-link:hover {
+            background: var(--accent);
+            color: var(--bg-primary);
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px var(--shadow);
+        }
+
+        .add-app-card {
+            border: 2px dashed var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 280px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-app-card:hover {
+            border-color: var(--accent);
+            background: var(--bg-secondary);
+        }
+
+        .add-icon {
+            font-size: 3rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .add-app-card:hover .add-icon {
+            color: var(--accent);
+            transform: scale(1.2);
+        }
+
+        .add-text {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+            margin-top: 4rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+
+        @media (max-width: 768px) {
+            .apps-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .theme-toggle {
+                top: 1rem;
+                right: 1rem;
+            }
+
+            header {
+                margin-bottom: 3rem;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .app-card {
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        .app-card:nth-child(1) { animation-delay: 0.1s; }
+        .app-card:nth-child(2) { animation-delay: 0.2s; }
+        .app-card:nth-child(3) { animation-delay: 0.3s; }
+        .app-card:nth-child(4) { animation-delay: 0.4s; }
+        .app-card:nth-child(5) { animation-delay: 0.5s; }
+        .app-card:nth-child(6) { animation-delay: 0.6s; }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <span id="theme-icon">🌙</span>
+    </button>
+
+    <div class="container">
+        <header>
+            <h1>DEPLOYMENT HUB</h1>
+            <p class="subtitle">Your central portal for web applications</p>
+        </header>
+
+        <div class="apps-grid" id="appsGrid">
+            <!-- Example App 1 -->
+            <div class="app-card">
+                <div class="status-badge">LIVE</div>
+                <div class="app-icon">🚀</div>
+                <h2 class="app-title">Task Manager Pro</h2>
+                <p class="app-description">A powerful task management application with real-time collaboration, priority tracking, and deadline notifications.</p>
+                <a href="#" class="app-link">LAUNCH APP →</a>
+            </div>
+
+            <!-- Example App 2 -->
+            <div class="app-card">
+                <div class="status-badge">LIVE</div>
+                <div class="app-icon">📊</div>
+                <h2 class="app-title">Analytics Dashboard</h2>
+                <p class="app-description">Comprehensive data visualization dashboard with interactive charts, real-time metrics, and export capabilities.</p>
+                <a href="#" class="app-link">LAUNCH APP →</a>
+            </div>
+
+            <!-- Example App 3 -->
+            <div class="app-card">
+                <div class="status-badge">LIVE</div>
+                <div class="app-icon">🎨</div>
+                <h2 class="app-title">Design Studio</h2>
+                <p class="app-description">Creative workspace for designers with AI-powered tools, asset management, and collaborative features.</p>
+                <a href="#" class="app-link">LAUNCH APP →</a>
+            </div>
+
+            <!-- Example App 4 -->
+            <div class="app-card">
+                <div class="status-badge">LIVE</div>
+                <div class="app-icon">💬</div>
+                <h2 class="app-title">Chat Platform</h2>
+                <p class="app-description">Real-time messaging platform with channels, direct messages, file sharing, and bot integrations.</p>
+                <a href="#" class="app-link">LAUNCH APP →</a>
+            </div>
+
+            <!-- Example App 5 -->
+            <div class="app-card">
+                <div class="status-badge">LIVE</div>
+                <div class="app-icon">🎮</div>
+                <h2 class="app-title">Game Portal</h2>
+                <p class="app-description">Collection of browser-based games with leaderboards, achievements, and multiplayer support.</p>
+                <a href="#" class="app-link">LAUNCH APP →</a>
+            </div>
+
+            <!-- Add New App Card -->
+            <div class="app-card add-app-card" onclick="showAddAppInfo()">
+                <div class="add-icon">+</div>
+                <p class="add-text">Add New App</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>Deployment Hub © 2025 • Built for GitHub Pages</p>
+            <p style="margin-top: 0.5rem; opacity: 0.7;">To add a new app, edit the appsGrid section in index.html</p>
+        </footer>
+    </div>
+
+    <script>
+        // Theme Toggle
+        function toggleTheme() {
+            document.documentElement.classList.toggle('light');
+            const icon = document.getElementById('theme-icon');
+            icon.textContent = document.documentElement.classList.contains('light') ? '☀️' : '🌙';
+        }
+
+        // Detect system theme preference
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                document.documentElement.classList.add('light');
+                document.getElementById('theme-icon').textContent = '☀️';
+            }
+
+            // Listen for system theme changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+                if (event.matches) {
+                    document.documentElement.classList.remove('light');
+                    document.getElementById('theme-icon').textContent = '🌙';
+                } else {
+                    document.documentElement.classList.add('light');
+                    document.getElementById('theme-icon').textContent = '☀️';
+                }
+            });
+        });
+
+        // Add App Info
+        function showAddAppInfo() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+                padding: 2rem;
+            `;
+
+            modal.innerHTML = `
+                <div style="
+                    background: var(--bg-card);
+                    border: 2px solid var(--accent);
+                    border-radius: 16px;
+                    padding: 2rem;
+                    max-width: 600px;
+                    width: 100%;
+                    box-shadow: 0 20px 60px rgba(0, 217, 255, 0.3);
+                ">
+                    <h2 style="font-family: 'Syne', sans-serif; color: var(--accent); margin-bottom: 1rem;">Add New App</h2>
+                    <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
+                        To add a new app to your deployment hub:
+                    </p>
+                    <ol style="color: var(--text-secondary); line-height: 1.8; margin-left: 1.5rem; margin-bottom: 1.5rem;">
+                        <li>Open <code style="background: var(--bg-primary); padding: 0.2rem 0.5rem; border-radius: 4px; color: var(--accent);">index.html</code> in your editor</li>
+                        <li>Find the <code style="background: var(--bg-primary); padding: 0.2rem 0.5rem; border-radius: 4px; color: var(--accent);">appsGrid</code> section</li>
+                        <li>Copy an existing app card template</li>
+                        <li>Update the icon, title, description, and link</li>
+                        <li>Commit and push to GitHub</li>
+                    </ol>
+                    <button onclick="this.closest('[style*=fixed]').remove()" style="
+                        padding: 0.75rem 2rem;
+                        background: var(--accent);
+                        border: none;
+                        border-radius: 8px;
+                        color: var(--bg-primary);
+                        font-weight: 700;
+                        cursor: pointer;
+                        font-family: 'Space Mono', monospace;
+                        font-size: 0.9rem;
+                        letter-spacing: 0.05em;
+                    ">GOT IT</button>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+            modal.onclick = (e) => {
+                if (e.target === modal) modal.remove();
+            };
+        }
+    </script>
+</body>
+</html>
+

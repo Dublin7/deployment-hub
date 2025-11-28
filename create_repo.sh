@@ -75,6 +75,7 @@ NEXT STEPS (run these locally):
    - The workflow will run on push to apps.json and open a PR (see GitHub Actions logs).
 
 4) To run the apply script locally (requires a personal access token):
-   GITHUB_TOKEN=ghp_xxx node scripts/apply-apps.js --file=apps.json --repo=${OWNER}/${REPO} --branch=main
+   # WARNING: Do not hard-code your token. Use 'gh auth token' to get one.
+   GITHUB_TOKEN=$(gh auth token) node scripts/apply-apps.js --file=apps.json --repo=${OWNER}/${REPO} --branch=main
 
 EOF

@@ -1,0 +1,8 @@
+{
+  "name": "Agentic Deployment Hub",
+  "description": "A high-performance portal for managing web applications and AI agents, featuring smart auto-filling, AI icon generation, and real-time assistant capabilities.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
